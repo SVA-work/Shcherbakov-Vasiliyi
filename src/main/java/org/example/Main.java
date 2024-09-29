@@ -3,6 +3,8 @@ package org.example;
 import org.example.Animals.*;
 
 public class Main {
+  public Main() {
+  }
 
   public static void main(String[] args) {
     Camel camel = new Camel("land", "Верблюжатина");
