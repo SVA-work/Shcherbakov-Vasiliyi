@@ -1,7 +1,7 @@
 package org.example.Animals;
 
 public class Camel extends Animals {
-  public Camel(String move, String name) {
+  public Camel(Move move, String name) {
     super(move, name);
   }
 

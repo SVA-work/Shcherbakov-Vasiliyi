@@ -1,10 +1,12 @@
 package org.example.Animals;
 
+import org.example.Main;
+
 public abstract class Animals {
   protected String name;
-  protected String move;
+  protected Move move;
 
-  public Animals(String move, String name) {
+  public Animals(Move move, String name) {
     this.move = move;
     this.name = name;
   }
@@ -14,14 +16,9 @@ public abstract class Animals {
 
   public void move() {
     switch (this.move) {
-      case "land":
-        System.out.println(this.name + " идет");
-        break;
-      case "flying":
-        System.out.println(this.name + " летит");
-        break;
-      case "waterfowl":
-        System.out.println(this.name + " плывет");
+      case LAND -> System.out.println(this.name + " идет");
+      case FLYING -> System.out.println(this.name + " летит");
+      case SWIMMING -> System.out.println(this.name + " плывет");
     }
 
   }

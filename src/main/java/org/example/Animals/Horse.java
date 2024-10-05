@@ -2,7 +2,7 @@ package org.example.Animals;
 
 public class Horse extends Animals {
 
-  public Horse(String move, String name) {
+  public Horse(Move move, String name) {
     super(move, name);
   }
 

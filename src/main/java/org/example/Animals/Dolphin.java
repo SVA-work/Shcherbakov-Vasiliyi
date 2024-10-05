@@ -1,7 +1,7 @@
 package org.example.Animals;
 
 public class Dolphin extends Animals {
-  public Dolphin(String move, String name) {
+  public Dolphin(Move move, String name) {
     super(move, name);
   }
 
