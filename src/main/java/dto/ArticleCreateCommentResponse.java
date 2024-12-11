@@ -1,5 +1,5 @@
 package dto;
 
 
-public record ArticleCreateCommentResponse(String articleId) {
+public record ArticleCreateCommentResponse(String commentId) {
 }

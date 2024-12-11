@@ -1,4 +1,5 @@
 import Exeptions.ArticleFindException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.ArticleController;
 import entity.Article;
@@ -22,6 +23,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,9 +33,14 @@ class ApplicationTest {
   @Container
   public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
 
+  static {
+    POSTGRES.start();
+  }
+
   private static Jdbi jdbi;
 
   private Service service;
+
 
   @BeforeAll
   static void beforeAll() {
@@ -88,18 +95,23 @@ class ApplicationTest {
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
     assertEquals(201, createArticleResponse.statusCode());
+    long articleId = Long.parseLong(
+            objectMapper.readValue(createArticleResponse.body(),
+                            new TypeReference<Map<String, String>>() {
+                            })
+                    .get("id"));
 
     HttpResponse<String> createCommentResponse = HttpClient.newHttpClient()
             .send(
                     HttpRequest.newBuilder()
                             .POST(
                                     HttpRequest.BodyPublishers.ofString(
-                                            """
+                                            String.format("""
                                                     {
-                                                      "articleId": "1",
+                                                      "articleId": "%d",
                                                       "text": "123"
                                                     }
-                                                    """
+                                                    """, articleId)
                                     )
                             )
                             .uri(URI.create("http://localhost:4567/api/comments"))
@@ -108,17 +120,23 @@ class ApplicationTest {
             );
     assertEquals(201, createCommentResponse.statusCode());
 
+    long commentId = Long.parseLong(
+            objectMapper.readValue(createCommentResponse.body(),
+                            new TypeReference<Map<String, String>>() {
+                            })
+                    .get("commentId"));
+
     HttpResponse<String> articleUpdateRequest = HttpClient.newHttpClient()
             .send(
                     HttpRequest.newBuilder()
                             .PUT(
                                     HttpRequest.BodyPublishers.ofString(
-                                            """
+                                            String.format("""
                                                     {
-                                                      "articleId": "1",
+                                                      "articleId": "%d",
                                                       "name": "qwerty updated"
                                                     }
-                                                    """
+                                                    """, articleId)
                                     )
                             )
                             .uri(URI.create("http://localhost:4567/api/articles/update"))
@@ -131,7 +149,8 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .DELETE()
-                            .uri(URI.create("http://localhost:4567/api/comments/delete/1/0"))
+                            .uri(URI.create(
+                                    String.format("http://localhost:4567/api/comments/delete/%d/%d", articleId, commentId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -141,7 +160,7 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .GET()
-                            .uri(URI.create("http://localhost:4567/api/articles/get/1"))
+                            .uri(URI.create(String.format("http://localhost:4567/api/articles/get/%d", articleId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -155,7 +174,7 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .DELETE()
-                            .uri(URI.create("http://localhost:4567/api/articles/delete/1"))
+                            .uri(URI.create(String.format("http://localhost:4567/api/articles/delete/%d", articleId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -165,7 +184,7 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .DELETE()
-                            .uri(URI.create("http://localhost:4567/api/articles/delete/1"))
+                            .uri(URI.create(String.format("http://localhost:4567/api/articles/delete/%d", articleId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -175,7 +194,7 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .GET()
-                            .uri(URI.create("http://localhost:4567/api/articles/get/1"))
+                            .uri(URI.create(String.format("http://localhost:4567/api/articles/get/%d", articleId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -185,7 +204,8 @@ class ApplicationTest {
             .send(
                     HttpRequest.newBuilder()
                             .DELETE()
-                            .uri(URI.create("http://localhost:4567/api/comments/delete/1/0"))
+                            .uri(URI.create(
+                                    String.format("http://localhost:4567/api/comments/delete/%d/%d", articleId, commentId)))
                             .build(),
                     HttpResponse.BodyHandlers.ofString(UTF_8)
             );
@@ -196,12 +216,12 @@ class ApplicationTest {
                     HttpRequest.newBuilder()
                             .PUT(
                                     HttpRequest.BodyPublishers.ofString(
-                                            """
+                                            String.format("""
                                                     {
-                                                      "articleId": "1",
+                                                      "articleId": "%d",
                                                       "name": "qwerty updated"
                                                     }
-                                                    """
+                                                    """, articleId)
                                     )
                             )
                             .uri(URI.create("http://localhost:4567/api/articles/update"))

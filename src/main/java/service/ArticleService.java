@@ -50,17 +50,16 @@ public class ArticleService {
   }
 
   public void update(ArticleId articleId, String name) throws ArticleUpdateException {
-    Article article;
     try {
-      article = articleRepository.findById(articleId);
+      articleRepository.findById(articleId);
     } catch (ArticleNotFoundException e) {
-      throw new ArticleUpdateException("Cannot find article with id=" + articleId.id(), e);
+      throw new ArticleUpdateException("Cannot find article with id=" + articleId.id());
     }
 
     try {
       articleRepository.update(name, articleId);
     } catch (ArticleNotFoundException e) {
-      throw new ArticleUpdateException("Cannot update article with id=" + articleId.id(), e);
+      throw new ArticleUpdateException("Cannot update article with id=" + articleId.id());
     }
   }
 
@@ -68,18 +67,18 @@ public class ArticleService {
     try {
       articleRepository.delete(articleId);
     } catch (ArticleNotFoundException e) {
-      throw new ArticleDeleteException("Cannot delete article with id=" + articleId, e);
+      throw new ArticleDeleteException("Cannot delete article with id=" + articleId);
     }
   }
 
-  public void createComment(ArticleId articleId, String text) throws ArticleFindException {
+  public long createComment(ArticleId articleId, String text) throws ArticleFindException {
     try {
       findById(articleId);
     } catch (ArticleFindException e) {
       throw new ArticleFindException("Cannot find article with id " + articleId.id());
     }
 
-    articleRepository.addComment(articleId, text);
+    return articleRepository.addComment(articleId, text);
   }
 
   public void deleteComment(ArticleId articleId, CommentId commentId) throws ArticleFindException {

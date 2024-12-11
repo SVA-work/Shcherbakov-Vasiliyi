@@ -134,9 +134,9 @@ public class ArticleController implements Controller {
       response.type("application/json");
       String body = request.body();
       ArticleCreateCommentRequest articleCreateCommentRequest = objectMapper.readValue(body, ArticleCreateCommentRequest.class);
-      articleService.createComment(new ArticleId(Integer.parseInt(articleCreateCommentRequest.articleId())), articleCreateCommentRequest.text());
+      long commentId = articleService.createComment(new ArticleId(Integer.parseInt(articleCreateCommentRequest.articleId())), articleCreateCommentRequest.text());
       response.status(201);
-      return objectMapper.writeValueAsString(new ArticleCreateCommentResponse(articleCreateCommentRequest.articleId()));
+      return objectMapper.writeValueAsString(new ArticleCreateCommentResponse(String.valueOf(commentId)));
     });
   }
 

@@ -1,5 +1,6 @@
 package repositories;
 
+import Exeptions.ArticleDeleteException;
 import Exeptions.ArticleIdDuplicatedException;
 import Exeptions.ArticleNotFoundException;
 import entity.Article;
@@ -86,12 +87,16 @@ public class ArticleRepository implements ArticleRepositoryInterface {
   @Override
   public long delete(ArticleId articleId) throws ArticleNotFoundException {
     return jdbi.inTransaction((Handle handle) -> {
-      ResultBearing resultBearing = handle.createUpdate(
-                      "DELETE FROM article WHERE id = :articleId")
-              .bind("articleId", articleId.id())
-              .executeAndReturnGeneratedKeys("id");
-      Map<String, Object> mapResult = resultBearing.mapToMap().first();
-      return ((Long) mapResult.get("id"));
+      try {
+        ResultBearing resultBearing = handle.createUpdate(
+                        "DELETE FROM article WHERE id = :articleId")
+                .bind("articleId", articleId.id())
+                .executeAndReturnGeneratedKeys("id");
+        Map<String, Object> mapResult = resultBearing.mapToMap().first();
+        return ((Long) mapResult.get("id"));
+      } catch (IllegalStateException e) {
+        throw new ArticleNotFoundException("");
+      }
     });
   }
 
